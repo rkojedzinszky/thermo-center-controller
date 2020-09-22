@@ -1,3 +1,7 @@
 domain: kojedz.in
 repo: github.com/rkojedzinszky/thermo-center-controller
+resources:
+- group: kojedz.in
+  kind: ThermoCenter
+  version: v1alpha1
 version: "2"

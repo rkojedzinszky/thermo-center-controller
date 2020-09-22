@@ -1,0 +1,24 @@
+# permissions for end users to edit thermocenters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: thermocenter-editor-role
+rules:
+- apiGroups:
+  - kojedz.in.kojedz.in
+  resources:
+  - thermocenters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kojedz.in.kojedz.in
+  resources:
+  - thermocenters/status
+  verbs:
+  - get

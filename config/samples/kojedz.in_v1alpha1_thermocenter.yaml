@@ -1,0 +1,7 @@
+apiVersion: kojedz.in.kojedz.in/v1alpha1
+kind: ThermoCenter
+metadata:
+  name: thermocenter-sample
+spec:
+  # Add fields here
+  foo: bar

@@ -1,0 +1,189 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (unknown)
+  creationTimestamp: null
+  name: thermocenters.kojedz.in
+spec:
+  group: kojedz.in
+  names:
+    kind: ThermoCenter
+    listKind: ThermoCenterList
+    plural: thermocenters
+    singular: thermocenter
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ThermoCenter is the Schema for the thermocenters API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ThermoCenterSpec defines the desired state of ThermoCenter
+            properties:
+              api:
+                description: Deployment base parameters
+                properties:
+                  image:
+                    type: string
+                  replicas:
+                    format: int32
+                    type: integer
+                type: object
+              database:
+                description: Postgresql access configuration
+                properties:
+                  host:
+                    type: string
+                  name:
+                    type: string
+                  password:
+                    type: string
+                  port:
+                    format: int32
+                    type: integer
+                  user:
+                    type: string
+                required:
+                - host
+                - name
+                - password
+                - port
+                - user
+                type: object
+              externalMQTT:
+                description: ExternalMQTT points to an external mqtt instance
+                properties:
+                  hostname:
+                    description: Hostname of MQTT broker
+                    type: string
+                  port:
+                    description: Port of MQTT broker, defaults to 1883
+                    type: integer
+                required:
+                - hostname
+                type: object
+              externalMemcached:
+                description: ExternalMemcached points to an external memcached instance
+                properties:
+                  hostname:
+                    description: Hostname of memcached
+                    type: string
+                  port:
+                    description: Port of memcached, defaults to 11211
+                    type: integer
+                required:
+                - hostname
+                type: object
+              graphite:
+                description: Graphite parameter specification
+                properties:
+                  host:
+                    description: Hostname specifies the hostname for Graphite/Carbon
+                      line receiver
+                    type: string
+                  port:
+                    description: Port Specifies the port for Graphite/Carbon line
+                      receiver
+                    type: integer
+                required:
+                - host
+                type: object
+              grpc:
+                description: Deployment base parameters
+                properties:
+                  image:
+                    type: string
+                  replicas:
+                    format: int32
+                    type: integer
+                type: object
+              ingress:
+                description: Ingress represents Ingress parameters
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Extra annotations to add to Kubernetes Ingress resource
+                    type: object
+                  hostNames:
+                    description: HostNames is a list of DNS domain names which will
+                      point to a ThermoCenter installation
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  tls:
+                    description: TLS specifies whether to generate tls section in
+                      Kubernetes Ingress resource
+                    type: boolean
+                required:
+                - hostNames
+                type: object
+              receiver:
+                description: Deployment base parameters
+                properties:
+                  image:
+                    type: string
+                  replicas:
+                    format: int32
+                    type: integer
+                type: object
+              replicas:
+                description: Desired replicas of all components, defaults to 1
+                format: int32
+                type: integer
+              ui:
+                description: Deployment specifications, on production deployments
+                  these are typically not specified
+                properties:
+                  image:
+                    type: string
+                  replicas:
+                    format: int32
+                    type: integer
+                type: object
+              version:
+                description: Version defines the desired version. If empty, uses 'latest'
+                  tag for all images
+                type: string
+              ws:
+                description: Deployment base parameters
+                properties:
+                  image:
+                    type: string
+                  replicas:
+                    format: int32
+                    type: integer
+                type: object
+            required:
+            - ingress
+            - replicas
+            type: object
+          status:
+            description: ThermoCenterStatus defines the observed state of ThermoCenter
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

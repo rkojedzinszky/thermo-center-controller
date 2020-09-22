@@ -1,0 +1,20 @@
+# permissions for end users to view thermocenters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: thermocenter-viewer-role
+rules:
+- apiGroups:
+  - kojedz.in.kojedz.in
+  resources:
+  - thermocenters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kojedz.in.kojedz.in
+  resources:
+  - thermocenters/status
+  verbs:
+  - get
