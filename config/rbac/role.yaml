@@ -6,13 +6,41 @@ metadata:
   creationTimestamp: null
   name: thermo-center-controller
 rules:
-- resources:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
   - secrets
   verbs:
   - create
   - get
-  - patch
+  - list
   - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - create
+  - get
+  - list
+  - update
+  - watch
 - apiGroups:
   - apps
   resources:
@@ -20,8 +48,9 @@ rules:
   verbs:
   - create
   - get
-  - patch
+  - list
   - update
+  - watch
 - apiGroups:
   - batch
   resources:
@@ -30,17 +59,15 @@ rules:
   - create
   - delete
   - get
+  - list
   - watch
 - apiGroups:
   - kojedz.in
   resources:
   - thermocenters
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
   - update
   - watch
 - apiGroups:
@@ -49,7 +76,6 @@ rules:
   - thermocenters/status
   verbs:
   - get
-  - patch
   - update
 - apiGroups:
   - networking.k8s.io
@@ -58,8 +84,9 @@ rules:
   verbs:
   - create
   - get
-  - patch
+  - list
   - update
+  - watch
 - apiGroups:
   - networking.k8s.io
   resources:
@@ -67,5 +94,6 @@ rules:
   verbs:
   - create
   - get
-  - patch
+  - list
   - update
+  - watch

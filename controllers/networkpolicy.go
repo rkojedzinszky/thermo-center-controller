@@ -12,7 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;create;update;patch
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update
 
 func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.ThermoCenter) error {
 	policyName := i.Name + "-default"

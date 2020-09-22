@@ -90,8 +90,10 @@ func NewThermoCenterReconciler(mgr manager.Manager) *ThermoCenterReconciler {
 	}
 }
 
-// +kubebuilder:rbac:groups=kojedz.in,resources=thermocenters,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=kojedz.in,resources=thermocenters/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=kojedz.in,resources=thermocenters,verbs=get;list;watch;update
+// +kubebuilder:rbac:groups=kojedz.in,resources=thermocenters/status,verbs=get;update
+// +kubebuilder:rbac:groups="",resources=pods,verbs=get;list
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;create;update
 
 func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
@@ -175,7 +177,8 @@ func (r *ThermoCenterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;create;update;patch
+// +kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update
 
 func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) error {
 	var err error

@@ -12,7 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// +kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;create;update;patch
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update
 
 func (r *ThermoCenterReconciler) reconcileIngressTLSSecretName(i *kojedzinv1alpha1.ThermoCenter) string {
 	return i.Name + "-tls-secret"
