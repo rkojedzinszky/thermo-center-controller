@@ -16,7 +16,16 @@ spec:
     singular: thermocenter
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - description: Database version
+      jsonPath: .status.databaseVersion
+      name: DBVer
+      type: string
+    - description: ThermoCenter status
+      jsonPath: .status.status
+      name: Status
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: ThermoCenter is the Schema for the thermocenters API
@@ -177,10 +186,20 @@ spec:
             type: object
           status:
             description: ThermoCenterStatus defines the observed state of ThermoCenter
+            properties:
+              databaseVersion:
+                type: string
+              status:
+                type: string
+            required:
+            - databaseVersion
+            - status
             type: object
         type: object
     served: true
     storage: true
+    subresources:
+      status: {}
 status:
   acceptedNames:
     kind: ""

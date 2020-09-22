@@ -12,9 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;watch;create;delete
@@ -30,8 +30,7 @@ func (r *ThermoCenterReconciler) needsMigration(i *kojedzinv1alpha1.ThermoCenter
 	}
 
 	// No migration needed if annotation matches desired version
-	oldVersion, ok := i.Annotations[thermoCenterDBVersionAnnotation]
-	if ok && oldVersion == *i.Spec.Version {
+	if i.Status.DatabaseVersion == *i.Spec.Version {
 		l.Info("Desired and annotated versions match, skipping migration")
 
 		return false
@@ -58,42 +57,48 @@ func (r *ThermoCenterReconciler) fetchMigrationJob(i *kojedzinv1alpha1.ThermoCen
 	return job, nil
 }
 
-func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCenter, job *batchv1.Job, l logr.Logger) (reconcile.Result, error) {
+func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCenter, job *batchv1.Job, l logr.Logger) (ctrl.Result, error) {
 	// Wait for completion
 	if len(job.Status.Conditions) == 0 {
-		return reconcile.Result{}, nil
+		return ctrl.Result{}, nil
 	}
-
-	l.Info("Migration job finished", "failed", job.Status.Failed, "succeeded", job.Status.Succeeded)
 
 	// Delete job
 	if err := r.Delete(context.TODO(), job, client.PropagationPolicy(metav1.DeletePropagationBackground)); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	// Requeue the job if failed
 	if job.Status.Conditions[0].Type == batchv1.JobFailed {
 		l.Info("Migration job failed, requeueing")
 
-		return reconcile.Result{Requeue: true}, nil
+		i.Status.Status = "migration failed"
+	} else {
+		l.Info("Migration job succeeded")
+
+		// Update db version from job to annotation
+		i.Status.Status = "migration done"
+		i.Status.DatabaseVersion = job.Annotations[thermoCenterDBVersionAnnotation]
 	}
 
-	// Update db version from job to annotation
-	if i.Annotations == nil {
-		i.Annotations = make(map[string]string)
-	}
-	i.Annotations[thermoCenterDBVersionAnnotation] = job.Annotations[thermoCenterDBVersionAnnotation]
-
-	l.Info("Updating CR annotation to reflect state")
+	l.Info("Updating Status")
 	// Update thermo-center instance with annotation. This will trigger a new reconcile cycle.
-	if err := r.Update(context.TODO(), i); err != nil {
-		return reconcile.Result{}, err
+	if err := r.Status().Update(context.TODO(), i); err != nil {
+		return ctrl.Result{}, err
 	}
 
-	return reconcile.Result{}, nil
+	return ctrl.Result{Requeue: true}, nil
 }
 
-func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCenter, l logr.Logger) (reconcile.Result, error) {
+func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCenter, l logr.Logger) (ctrl.Result, error) {
+	i.Status.Status = "migrating"
+
+	l.Info("Updating Status")
+	// Update thermo-center instance with annotation. This will trigger a new reconcile cycle.
+	if err := r.Status().Update(context.TODO(), i); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	// Create migration job
 	l.Info("Creating migration job", "targetVersion", *i.Spec.Version)
 
@@ -139,12 +144,12 @@ func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCe
 	}
 
 	if err := controllerutil.SetControllerReference(i, job, r.Scheme); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	if err := r.Create(context.TODO(), job); err != nil {
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
-	return reconcile.Result{}, nil
+	return ctrl.Result{}, nil
 }

@@ -117,11 +117,14 @@ type ThermoCenterSpec struct {
 
 // ThermoCenterStatus defines the observed state of ThermoCenter
 type ThermoCenterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	DatabaseVersion string `json:"databaseVersion"`
+	Status          string `json:"status"`
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:JSONPath=.status.databaseVersion,description="Database version",name=DBVer,type=string
+// +kubebuilder:printcolumn:JSONPath=.status.status,description="ThermoCenter status",name=Status,type=string
 
 // ThermoCenter is the Schema for the thermocenters API
 type ThermoCenter struct {

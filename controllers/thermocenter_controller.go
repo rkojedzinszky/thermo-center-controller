@@ -151,6 +151,11 @@ func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		}
 	}
 
+	instance.Status.Status = "ready"
+	if err = r.Status().Update(ctx, instance); err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
