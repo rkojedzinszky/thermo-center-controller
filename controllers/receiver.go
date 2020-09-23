@@ -34,7 +34,7 @@ func (rec *receiverReconciler) customizeDeployment(r *ThermoCenterReconciler, i 
 	deployment.Spec.Template.Spec.Containers[0].Env = []v1.EnvVar{
 		{
 			Name:  "GRPCSERVER_HOST",
-			Value: r.serviceName(i, r.grpc),
+			Value: thermoCenterServiceName(i, r.grpc),
 		},
 	}
 

@@ -48,7 +48,7 @@ func (api *apiReconciler) customizeDeployment(r *ThermoCenterReconciler, i *koje
 		},
 		{
 			Name:  "RECEIVER_HOST",
-			Value: r.serviceName(i, r.receiver),
+			Value: thermoCenterServiceName(i, r.receiver),
 		},
 	}
 

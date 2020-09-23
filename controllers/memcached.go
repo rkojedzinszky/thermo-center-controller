@@ -68,7 +68,7 @@ func (m *memcachedReconciler) customizeService(r *ThermoCenterReconciler, i *koj
 
 func (m *memcachedReconciler) serviceHost(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter) string {
 	if i.Spec.ExternalMemcached == nil {
-		return r.serviceName(i, m)
+		return thermoCenterServiceName(i, m)
 	}
 
 	return i.Spec.ExternalMemcached.Hostname

@@ -65,7 +65,7 @@ func (m *mqttReconciler) customizeService(r *ThermoCenterReconciler, i *kojedzin
 
 func (m *mqttReconciler) serviceHost(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter) string {
 	if i.Spec.ExternalMQTT == nil {
-		return r.serviceName(i, m)
+		return thermoCenterServiceName(i, m)
 	}
 
 	return i.Spec.ExternalMQTT.Hostname

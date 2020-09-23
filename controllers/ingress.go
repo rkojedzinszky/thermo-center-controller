@@ -94,7 +94,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 							PathType: &pathType,
 							Backend: networking.IngressBackend{
 								Service: &networking.IngressServiceBackend{
-									Name: r.serviceName(i, r.api),
+									Name: thermoCenterServiceName(i, r.api),
 									Port: networking.ServiceBackendPort{
 										Name: "http",
 									},
@@ -106,7 +106,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 							PathType: &pathType,
 							Backend: networking.IngressBackend{
 								Service: &networking.IngressServiceBackend{
-									Name: r.serviceName(i, r.api),
+									Name: thermoCenterServiceName(i, r.api),
 									Port: networking.ServiceBackendPort{
 										Name: "http",
 									},
@@ -118,7 +118,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 							PathType: &pathType,
 							Backend: networking.IngressBackend{
 								Service: &networking.IngressServiceBackend{
-									Name: r.serviceName(i, r.ws),
+									Name: thermoCenterServiceName(i, r.ws),
 									Port: networking.ServiceBackendPort{
 										Name: "http",
 									},
@@ -130,7 +130,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 							PathType: &pathType,
 							Backend: networking.IngressBackend{
 								Service: &networking.IngressServiceBackend{
-									Name: r.serviceName(i, r.ui),
+									Name: thermoCenterServiceName(i, r.ui),
 									Port: networking.ServiceBackendPort{
 										Name: "http",
 									},

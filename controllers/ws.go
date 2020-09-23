@@ -34,7 +34,7 @@ func (ws *wsReconciler) customizeDeployment(r *ThermoCenterReconciler, i *kojedz
 		},
 		{
 			Name:  "THERMO_CENTER_API_HOST",
-			Value: r.serviceName(i, r.api),
+			Value: thermoCenterServiceName(i, r.api),
 		},
 	}
 

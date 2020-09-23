@@ -192,7 +192,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 	//
 	// Create deployment
 	//
-	deploymentName := r.deploymentName(i, rec)
+	deploymentName := thermoCenterDeploymentName(i, rec)
 	deployment := &appsv1.Deployment{}
 	deploymentExists := true
 
@@ -276,7 +276,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 
 	//
 	// Reconcile service
-	serviceName := r.serviceName(i, rec)
+	serviceName := thermoCenterServiceName(i, rec)
 	service := &corev1.Service{}
 	serviceExists := true
 
@@ -339,11 +339,11 @@ type deploymentReconciler interface {
 	customizeService(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *corev1.Service) *corev1.Service
 }
 
-func (r *ThermoCenterReconciler) deploymentName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {
+func thermoCenterDeploymentName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {
 	return i.Name + "-" + rec.component()
 }
 
-func (r *ThermoCenterReconciler) serviceName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {
+func thermoCenterServiceName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {
 	return i.Name + "-" + rec.component()
 }
 
