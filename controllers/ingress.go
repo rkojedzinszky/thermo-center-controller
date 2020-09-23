@@ -13,6 +13,7 @@ import (
 )
 
 // +kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update
 
 func (r *ThermoCenterReconciler) reconcileIngressTLSSecretName(i *kojedzinv1alpha1.ThermoCenter) string {
 	return i.Name + "-tls-secret"
