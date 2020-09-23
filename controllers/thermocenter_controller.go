@@ -139,6 +139,17 @@ func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		return r.createMigrationJob(instance, reqLogger)
 	}
 
+	// Set to ready state
+	if instance.Status.Status != "ready" {
+		instance.Status.Status = "ready"
+
+		if err = r.Status().Update(ctx, instance); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{}, nil
+	}
+
 	// Reconcile ingress
 	err = r.reconcileIngress(instance)
 	if err != nil {
@@ -151,11 +162,6 @@ func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		if err != nil {
 			return ctrl.Result{}, err
 		}
-	}
-
-	instance.Status.Status = "ready"
-	if err = r.Status().Update(ctx, instance); err != nil {
-		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil

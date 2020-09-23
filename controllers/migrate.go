@@ -31,7 +31,7 @@ func (r *ThermoCenterReconciler) needsMigration(i *kojedzinv1alpha1.ThermoCenter
 
 	// No migration needed if annotation matches desired version
 	if i.Status.DatabaseVersion == *i.Spec.Version {
-		l.Info("Desired and annotated versions match, skipping migration")
+		l.Info("Desired and current databae versions match, skipping migration")
 
 		return false
 	}
@@ -87,7 +87,7 @@ func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCe
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{}, nil
 }
 
 func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCenter, l logr.Logger) (ctrl.Result, error) {
