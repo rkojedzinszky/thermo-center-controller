@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thermo-center-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: thermo-center-controller
+  template:
+    metadata:
+      labels:
+        name: thermo-center-controller
+    spec:
+      serviceAccountName: thermo-center-controller
+      containers:
+        - name: controller
+          image: rkojedzinszky/thermo-center-controller
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
