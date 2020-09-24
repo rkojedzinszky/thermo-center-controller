@@ -38,6 +38,7 @@ var mqttDeployment = &kojedzinv1alpha1.Deployment{
 }
 
 type mqttReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (m *mqttReconciler) component() string {

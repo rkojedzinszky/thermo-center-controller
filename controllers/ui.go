@@ -31,6 +31,7 @@ import (
 )
 
 type uiReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (u *uiReconciler) component() string {

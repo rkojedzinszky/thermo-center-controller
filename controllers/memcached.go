@@ -38,6 +38,7 @@ var memcachedDeployment = &kojedzinv1alpha1.Deployment{
 }
 
 type memcachedReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (m *memcachedReconciler) component() string {

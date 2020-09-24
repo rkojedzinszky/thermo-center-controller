@@ -31,6 +31,7 @@ import (
 )
 
 type wsReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (ws *wsReconciler) component() string {

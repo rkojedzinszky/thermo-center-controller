@@ -26,11 +26,14 @@ package controllers
 
 import (
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 type receiverReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (rec *receiverReconciler) component() string {
@@ -53,21 +56,12 @@ func (rec *receiverReconciler) customizePodSpec(r *ThermoCenterReconciler, i *ko
 		},
 	}
 
-	ps.Containers[0].Env = []v1.EnvVar{
-		{
+	ps.Containers[0].Env = append(ps.Containers[0].Env,
+		v1.EnvVar{
 			Name:  "GRPCSERVER_HOST",
 			Value: thermoCenterServiceName(i, r.grpc),
 		},
-	}
-
-	/*
-		ps.Spec.Strategy = appsv1.DeploymentStrategy{
-			Type: appsv1.RollingUpdateDeploymentStrategyType,
-			RollingUpdate: &appsv1.RollingUpdateDeployment{
-				MaxUnavailable: &intstr.IntOrString{IntVal: 1},
-			},
-		}
-	*/
+	)
 
 	return ps
 }
@@ -79,4 +73,13 @@ func (rec *receiverReconciler) customizeService(r *ThermoCenterReconciler, i *ko
 	}}
 
 	return service
+}
+
+func (rec *receiverReconciler) customizeDeployment(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, d *appsv1.Deployment) {
+	d.Spec.Strategy = appsv1.DeploymentStrategy{
+		Type: appsv1.RollingUpdateDeploymentStrategyType,
+		RollingUpdate: &appsv1.RollingUpdateDeployment{
+			MaxUnavailable: &intstr.IntOrString{IntVal: 1},
+		},
+	}
 }

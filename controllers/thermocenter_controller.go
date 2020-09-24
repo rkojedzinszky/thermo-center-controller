@@ -269,6 +269,9 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 			deployment.Spec.Replicas = &i.Spec.Replicas
 		}
 
+		// Final deployment customization
+		rec.customizeDeployment(r, i, deployment)
+
 		if deploymentExists {
 			err = r.Update(context.TODO(), deployment)
 		} else {
@@ -340,11 +343,30 @@ type deploymentReconciler interface {
 	// Extract kojedzinv1alpha1.Deployment to use to construct appsv1.Deployment
 	getDeployment(*kojedzinv1alpha1.ThermoCenter) *kojedzinv1alpha1.Deployment
 
-	// Customize appsv1.Deployment
+	// Customize v1.PodSpec
 	customizePodSpec(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *v1.PodSpec) *v1.PodSpec
 
 	// Customize corev1.Service
 	customizeService(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *v1.Service) *v1.Service
+
+	// Customize appsv1.Deployment
+	customizeDeployment(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *appsv1.Deployment)
+}
+
+type defaultDeploymentReconciler struct{}
+
+// Customize v1.PodSpec
+func (*defaultDeploymentReconciler) customizePodSpec(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, ps *v1.PodSpec) *v1.PodSpec {
+	return ps
+}
+
+// Customize corev1.Service
+func (*defaultDeploymentReconciler) customizeService(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, svc *v1.Service) *v1.Service {
+	return svc
+}
+
+// Customize appsv1.Deployment
+func (*defaultDeploymentReconciler) customizeDeployment(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, _ *appsv1.Deployment) {
 }
 
 func thermoCenterDeploymentName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {

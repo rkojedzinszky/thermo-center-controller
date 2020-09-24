@@ -34,6 +34,7 @@ import (
 )
 
 type apiReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (api *apiReconciler) component() string {

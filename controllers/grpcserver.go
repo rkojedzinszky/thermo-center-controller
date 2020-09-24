@@ -33,6 +33,7 @@ import (
 )
 
 type grpcReconciler struct {
+	defaultDeploymentReconciler
 }
 
 func (grpc *grpcReconciler) component() string {
