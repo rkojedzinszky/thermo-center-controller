@@ -6,7 +6,7 @@ import (
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
 	networking "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -28,7 +28,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 
 		found = false
 
-		policy.ObjectMeta = v1.ObjectMeta{
+		policy.ObjectMeta = metav1.ObjectMeta{
 			Namespace: i.Namespace,
 			Name:      policyName,
 		}
@@ -39,7 +39,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 	}
 
 	policy.Spec = networking.NetworkPolicySpec{
-		PodSelector: v1.LabelSelector{
+		PodSelector: metav1.LabelSelector{
 			MatchLabels: map[string]string{
 				ThermoCenterInstanceLabel: i.Name,
 			}},
@@ -50,7 +50,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 			{
 				From: []networking.NetworkPolicyPeer{
 					{
-						PodSelector: &v1.LabelSelector{
+						PodSelector: &metav1.LabelSelector{
 							MatchLabels: map[string]string{
 								ThermoCenterInstanceLabel: i.Name,
 							},
@@ -84,7 +84,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 
 		found = false
 
-		policy.ObjectMeta = v1.ObjectMeta{
+		policy.ObjectMeta = metav1.ObjectMeta{
 			Namespace: i.Namespace,
 			Name:      policyName,
 		}
@@ -97,7 +97,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 	httpPort := intstr.FromInt(8080)
 
 	policy.Spec = networking.NetworkPolicySpec{
-		PodSelector: v1.LabelSelector{
+		PodSelector: metav1.LabelSelector{
 			MatchLabels: map[string]string{
 				ThermoCenterInstanceLabel: i.Name,
 			}},

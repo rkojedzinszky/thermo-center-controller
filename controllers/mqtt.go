@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
-	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
@@ -25,13 +24,13 @@ func (m *mqttReconciler) getDeployment(i *kojedzinv1alpha1.ThermoCenter) *kojedz
 	return mqttDeployment
 }
 
-func (m *mqttReconciler) customizeDeployment(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, deployment *appsv1.Deployment) *appsv1.Deployment {
+func (m *mqttReconciler) customizePodSpec(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, ps *v1.PodSpec) *v1.PodSpec {
 	if i.Spec.ExternalMQTT != nil {
 		return nil
 	}
 
 	// Resource requirements
-	deployment.Spec.Template.Spec.Containers[0].Resources = v1.ResourceRequirements{
+	ps.Containers[0].Resources = v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU:    resource.MustParse("10m"),
 			v1.ResourceMemory: resource.MustParse("8Mi"),
@@ -42,16 +41,16 @@ func (m *mqttReconciler) customizeDeployment(r *ThermoCenterReconciler, i *kojed
 	runAsUser := int64(1883)
 	runAsGroup := int64(1883)
 
-	deployment.Spec.Template.Spec.SecurityContext.RunAsUser = &runAsUser
-	deployment.Spec.Template.Spec.SecurityContext.RunAsGroup = &runAsGroup
+	ps.SecurityContext.RunAsUser = &runAsUser
+	ps.SecurityContext.RunAsGroup = &runAsGroup
 
 	// Ports
-	deployment.Spec.Template.Spec.Containers[0].Ports = []v1.ContainerPort{{
+	ps.Containers[0].Ports = []v1.ContainerPort{{
 		Name:          m.component(),
 		ContainerPort: 1883,
 	}}
 
-	return deployment
+	return ps
 }
 
 func (m *mqttReconciler) customizeService(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, service *v1.Service) *v1.Service {

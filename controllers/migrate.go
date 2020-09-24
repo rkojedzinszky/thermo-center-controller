@@ -6,10 +6,8 @@ import (
 	"github.com/go-logr/logr"
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -103,9 +101,14 @@ func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCe
 	l.Info("Creating migration job", "targetVersion", *i.Spec.Version)
 
 	var activeDeadlineSeconds int64 = 600
-	enableServiceLinks := false
-	runAsNonRoot := true
-	image := setImageTag(i, "rkojedzinszky/thermo-center-"+r.api.component())
+
+	// Customize api POD for migration
+	ps := r.getPodSpec(i, r.api)
+	ps.Containers[0].Name = "migrate"
+	ps.Containers[0].Command = []string{"python", "manage.py", "migrate"}
+	ps.Containers[0].LivenessProbe = nil
+	ps.Containers[0].ReadinessProbe = nil
+	ps.RestartPolicy = v1.RestartPolicyNever
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -117,28 +120,8 @@ func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCe
 		},
 		Spec: batchv1.JobSpec{
 			ActiveDeadlineSeconds: &activeDeadlineSeconds,
-			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{{
-						Name:    "migrate",
-						Image:   image,
-						Command: []string{"python", "manage.py", "migrate"},
-						EnvFrom: []corev1.EnvFromSource{{
-							SecretRef: &v1.SecretEnvSource{LocalObjectReference: v1.LocalObjectReference{Name: thermoCenterSecretName(i)}},
-						}},
-						Resources: v1.ResourceRequirements{
-							Requests: v1.ResourceList{
-								v1.ResourceCPU:    resource.MustParse("10m"),
-								v1.ResourceMemory: resource.MustParse("48Mi"),
-							},
-						},
-					}},
-					EnableServiceLinks: &enableServiceLinks,
-					SecurityContext: &corev1.PodSecurityContext{
-						RunAsNonRoot: &runAsNonRoot,
-					},
-					RestartPolicy: corev1.RestartPolicyOnFailure,
-				},
+			Template: v1.PodTemplateSpec{
+				Spec: *ps,
 			},
 		},
 	}

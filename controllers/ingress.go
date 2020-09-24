@@ -4,10 +4,10 @@ import (
 	"context"
 
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	networking "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
@@ -25,7 +25,7 @@ func (r *ThermoCenterReconciler) reconcileIngressTLSSecret(i *kojedzinv1alpha1.T
 	}
 
 	secretName := r.reconcileIngressTLSSecretName(i)
-	secret := &corev1.Secret{}
+	secret := &v1.Secret{}
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: secretName}, secret)
 
 	// Return if found or other than not-found error encountered
@@ -33,12 +33,12 @@ func (r *ThermoCenterReconciler) reconcileIngressTLSSecret(i *kojedzinv1alpha1.T
 		return err
 	}
 
-	secret = &corev1.Secret{
-		ObjectMeta: v1.ObjectMeta{
+	secret = &v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
 			Namespace: i.Namespace,
 			Name:      secretName,
 		},
-		Type: corev1.SecretTypeTLS,
+		Type: v1.SecretTypeTLS,
 		Data: map[string][]byte{
 			"tls.key": {},
 			"tls.crt": {},
@@ -70,7 +70,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 
 		found = false
 
-		ingress.ObjectMeta = v1.ObjectMeta{
+		ingress.ObjectMeta = metav1.ObjectMeta{
 			Namespace: i.Namespace,
 			Name:      ingressName,
 		}

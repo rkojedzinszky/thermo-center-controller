@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -27,7 +27,7 @@ const (
 // Reconcile secret for thermo-center
 func (r *ThermoCenterReconciler) reconcileSecret(i *kojedzinv1alpha1.ThermoCenter) error {
 	secretName := thermoCenterSecretName(i)
-	secret := &corev1.Secret{}
+	secret := &v1.Secret{}
 	found := true
 
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: secretName}, secret)

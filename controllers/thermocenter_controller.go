@@ -34,7 +34,7 @@ import (
 	"github.com/go-logr/logr"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -183,6 +183,34 @@ func (r *ThermoCenterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) *v1.PodSpec {
+	enableServiceLinks := false
+	runAsNonRoot := true
+
+	dep := rec.getDeployment(i)
+
+	// Assign image
+	var image string
+	if dep != nil && dep.Image != "" {
+		image = dep.Image
+	} else {
+		image = "rkojedzinszky/thermo-center-" + rec.component()
+	}
+
+	ps := &v1.PodSpec{
+		Containers: []v1.Container{{
+			Name:  rec.component(),
+			Image: setImageTag(i, image),
+		}},
+		EnableServiceLinks: &enableServiceLinks,
+		SecurityContext: &v1.PodSecurityContext{
+			RunAsNonRoot: &runAsNonRoot,
+		},
+	}
+
+	return rec.customizePodSpec(r, i, ps)
+}
+
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update
 
@@ -205,8 +233,6 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 		deploymentExists = false
 
 		ls := labelsForComponent(i, rec.component())
-		enableServiceLinks := false
-		runAsNonRoot := true
 
 		deployment = &appsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
@@ -217,18 +243,9 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 				Selector: &metav1.LabelSelector{
 					MatchLabels: ls,
 				},
-				Template: corev1.PodTemplateSpec{
+				Template: v1.PodTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Labels: ls,
-					},
-					Spec: corev1.PodSpec{
-						Containers: []corev1.Container{{
-							Name: rec.component(),
-						}},
-						EnableServiceLinks: &enableServiceLinks,
-						SecurityContext: &corev1.PodSecurityContext{
-							RunAsNonRoot: &runAsNonRoot,
-						},
 					},
 				},
 			},
@@ -239,35 +256,26 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 		}
 	}
 
-	dep := rec.getDeployment(i)
+	// Set podSpec
+	ps := r.getPodSpec(i, rec)
 
-	// Assign image
-	var image string
-	if dep != nil && dep.Image != "" {
-		image = dep.Image
-	} else {
-		image = "rkojedzinszky/thermo-center-" + rec.component()
-	}
-	deployment.Spec.Template.Spec.Containers[0].Image = setImageTag(i, image)
+	if ps != nil {
+		deployment.Spec.Template.Spec = *ps
+		dep := rec.getDeployment(i)
+		// Assign replicas
+		if dep != nil && dep.Replicas != nil {
+			deployment.Spec.Replicas = dep.Replicas
+		} else {
+			deployment.Spec.Replicas = &i.Spec.Replicas
+		}
 
-	// Assign replicas
-	if dep != nil && dep.Replicas != nil {
-		deployment.Spec.Replicas = dep.Replicas
-	} else {
-		deployment.Spec.Replicas = &i.Spec.Replicas
-	}
-
-	originalDeployment := deployment
-	deployment = rec.customizeDeployment(r, i, deployment)
-
-	if deployment != nil {
 		if deploymentExists {
 			err = r.Update(context.TODO(), deployment)
 		} else {
 			err = r.Create(context.TODO(), deployment)
 		}
 	} else if deploymentExists {
-		err = r.Delete(context.TODO(), originalDeployment)
+		err = r.Delete(context.TODO(), deployment)
 	}
 
 	if err != nil {
@@ -277,7 +285,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 	//
 	// Reconcile service
 	serviceName := thermoCenterServiceName(i, rec)
-	service := &corev1.Service{}
+	service := &v1.Service{}
 	serviceExists := true
 
 	err = r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: serviceName}, service)
@@ -289,12 +297,12 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 		serviceExists = false
 
 		if deployment != nil {
-			service = &corev1.Service{
+			service = &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: i.Namespace,
 					Name:      serviceName,
 				},
-				Spec: corev1.ServiceSpec{
+				Spec: v1.ServiceSpec{
 					Selector: deployment.Spec.Template.Labels,
 				},
 			}
@@ -333,10 +341,10 @@ type deploymentReconciler interface {
 	getDeployment(*kojedzinv1alpha1.ThermoCenter) *kojedzinv1alpha1.Deployment
 
 	// Customize appsv1.Deployment
-	customizeDeployment(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *appsv1.Deployment) *appsv1.Deployment
+	customizePodSpec(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *v1.PodSpec) *v1.PodSpec
 
 	// Customize corev1.Service
-	customizeService(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *corev1.Service) *corev1.Service
+	customizeService(*ThermoCenterReconciler, *kojedzinv1alpha1.ThermoCenter, *v1.Service) *v1.Service
 }
 
 func thermoCenterDeploymentName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {

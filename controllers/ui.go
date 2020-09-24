@@ -2,7 +2,6 @@ package controllers
 
 import (
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
-	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
@@ -18,16 +17,16 @@ func (u *uiReconciler) getDeployment(i *kojedzinv1alpha1.ThermoCenter) *kojedzin
 	return i.Spec.UI
 }
 
-func (u *uiReconciler) customizeDeployment(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, deployment *appsv1.Deployment) *appsv1.Deployment {
+func (u *uiReconciler) customizePodSpec(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, ps *v1.PodSpec) *v1.PodSpec {
 	// Resource requirements
-	deployment.Spec.Template.Spec.Containers[0].Resources = v1.ResourceRequirements{
+	ps.Containers[0].Resources = v1.ResourceRequirements{
 		Requests: v1.ResourceList{
 			v1.ResourceCPU:    resource.MustParse("1m"),
 			v1.ResourceMemory: resource.MustParse("8Mi"),
 		},
 	}
 
-	return deployment
+	return ps
 }
 
 func (u *uiReconciler) customizeService(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, service *v1.Service) *v1.Service {
