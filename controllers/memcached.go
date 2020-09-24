@@ -87,8 +87,14 @@ func (m *memcachedReconciler) servicePort(r *ThermoCenterReconciler, i *kojedzin
 }
 
 func (m *memcachedReconciler) setEnvironment(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, env *[]v1.EnvVar) {
-	mergeEnvironmentVariables(env, map[string]string{
-		"MEMCACHED_HOST": m.serviceHost(r, i),
-		"MEMCACHED_PORT": strconv.Itoa(m.servicePort(r, i)),
-	})
+	*env = append(*env,
+		v1.EnvVar{
+			Name:  "MEMCACHED_HOST",
+			Value: m.serviceHost(r, i),
+		},
+		v1.EnvVar{
+			Name:  "MEMCACHED_PORT",
+			Value: strconv.Itoa(m.servicePort(r, i)),
+		},
+	)
 }

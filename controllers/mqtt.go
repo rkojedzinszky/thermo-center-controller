@@ -84,8 +84,14 @@ func (m *mqttReconciler) servicePort(r *ThermoCenterReconciler, i *kojedzinv1alp
 }
 
 func (m *mqttReconciler) setEnvironment(r *ThermoCenterReconciler, i *kojedzinv1alpha1.ThermoCenter, env *[]v1.EnvVar) {
-	mergeEnvironmentVariables(env, map[string]string{
-		"MQTT_HOST": m.serviceHost(r, i),
-		"MQTT_PORT": strconv.Itoa(m.servicePort(r, i)),
-	})
+	*env = append(*env,
+		v1.EnvVar{
+			Name:  "MQTT_HOST",
+			Value: m.serviceHost(r, i),
+		},
+		v1.EnvVar{
+			Name:  "MQTT_PORT",
+			Value: strconv.Itoa(m.servicePort(r, i)),
+		},
+	)
 }
