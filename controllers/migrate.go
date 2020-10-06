@@ -98,7 +98,6 @@ func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCe
 		i.Status.DatabaseVersion = job.Annotations[thermoCenterDBVersionAnnotation]
 	}
 
-	l.Info("Updating Status")
 	// Update thermo-center instance status.
 	if err := r.Status().Update(context.TODO(), i); err != nil {
 		return ctrl.Result{}, err
@@ -113,14 +112,6 @@ func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCe
 }
 
 func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCenter, l logr.Logger) (ctrl.Result, error) {
-	i.Status.Status = "migrating"
-
-	l.Info("Updating Status")
-	// Update thermo-center instance with annotation. This will trigger a new reconcile cycle.
-	if err := r.Status().Update(context.TODO(), i); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// Create migration job
 	l.Info("Creating migration job", "targetVersion", *i.Spec.Version)
 
@@ -155,6 +146,12 @@ func (r *ThermoCenterReconciler) createMigrationJob(i *kojedzinv1alpha1.ThermoCe
 	}
 
 	if err := r.Create(context.TODO(), job); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Update thermo-center status
+	i.Status.Status = "migrating"
+	if err := r.Status().Update(context.TODO(), i); err != nil {
 		return ctrl.Result{}, err
 	}
 
