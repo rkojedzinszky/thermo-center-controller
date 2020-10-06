@@ -139,15 +139,10 @@ func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		return r.createMigrationJob(instance, reqLogger)
 	}
 
-	// Set to ready state
-	if instance.Status.Status != "ready" {
-		instance.Status.Status = "ready"
-
-		if err = r.Status().Update(ctx, instance); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		return ctrl.Result{}, nil
+	// Set state to ready
+	instance.Status.Status = "ready"
+	if err = r.Status().Update(ctx, instance); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// Reconcile ingress
@@ -169,14 +164,11 @@ func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 
 func (r *ThermoCenterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kojedzinv1alpha1.ThermoCenter{}).
+		For(&kojedzinv1alpha1.ThermoCenter{}, builder.WithPredicates(predicate.GenerationChangedPredicate{})).
 		Watches(&source.Kind{Type: &batchv1.Job{}}, &handler.EnqueueRequestForOwner{
 			OwnerType: &kojedzinv1alpha1.ThermoCenter{},
 		}, builder.WithPredicates(predicate.Funcs{
 			CreateFunc: func(event.CreateEvent) bool {
-				return false
-			},
-			DeleteFunc: func(event.DeleteEvent) bool {
 				return false
 			},
 		})).

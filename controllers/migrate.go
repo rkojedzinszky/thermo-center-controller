@@ -85,11 +85,6 @@ func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCe
 		return ctrl.Result{}, nil
 	}
 
-	// Delete job
-	if err := r.Delete(context.TODO(), job, client.PropagationPolicy(metav1.DeletePropagationBackground)); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// Requeue the job if failed
 	if job.Status.Conditions[0].Type == batchv1.JobFailed {
 		l.Info("Migration job failed, requeueing")
@@ -104,8 +99,13 @@ func (r *ThermoCenterReconciler) handleMigrationJob(i *kojedzinv1alpha1.ThermoCe
 	}
 
 	l.Info("Updating Status")
-	// Update thermo-center instance with annotation. This will trigger a new reconcile cycle.
+	// Update thermo-center instance status.
 	if err := r.Status().Update(context.TODO(), i); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Delete job. This will trigger new reconcile cycle.
+	if err := r.Delete(context.TODO(), job, client.PropagationPolicy(metav1.DeletePropagationBackground)); err != nil {
 		return ctrl.Result{}, err
 	}
 
