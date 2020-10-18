@@ -82,6 +82,10 @@ type Graphite struct {
 
 	// Port Specifies the port for Graphite/Carbon line receiver
 	Port uint16 `json:"port,omitempty"`
+
+	// MetricPathTemplate is used to construct Graphite metric paths.
+	// During interpolation, `SensorID` and `Metric` fields are available.
+	MetricPathTemplate string `json:"metricPathTemplate,omitempty"`
 }
 
 // ThermoCenterSpec defines the desired state of ThermoCenter

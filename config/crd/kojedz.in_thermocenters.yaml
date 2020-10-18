@@ -106,6 +106,11 @@ spec:
                     description: Hostname specifies the hostname for Graphite/Carbon
                       line receiver
                     type: string
+                  metricPathTemplate:
+                    description: MetricPathTemplate is used to construct Graphite
+                      metric paths. During interpolation, `SensorID` and `Metric`
+                      fields are available.
+                    type: string
                   port:
                     description: Port Specifies the port for Graphite/Carbon line
                       receiver

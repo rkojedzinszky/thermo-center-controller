@@ -77,6 +77,15 @@ func (grpc *grpcReconciler) customizePodSpec(r *ThermoCenterReconciler, i *kojed
 		)
 	}
 
+	if i.Spec.Graphite.MetricPathTemplate != "" {
+		ps.Containers[0].Env = append(ps.Containers[0].Env,
+			v1.EnvVar{
+				Name:  "CARBON_LINE_RECEIVER_METRIC_PATH_TEMPLATE",
+				Value: i.Spec.Graphite.MetricPathTemplate,
+			},
+		)
+	}
+
 	r.memcached.setEnvironment(r, i, &ps.Containers[0].Env)
 	r.mqtt.setEnvironment(r, i, &ps.Containers[0].Env)
 
