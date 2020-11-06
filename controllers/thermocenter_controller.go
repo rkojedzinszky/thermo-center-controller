@@ -200,6 +200,12 @@ func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, re
 		},
 	}
 
+	if dep != nil {
+		ps.Affinity = dep.Affinity
+		ps.NodeSelector = dep.NodeSelector
+		ps.Tolerations = dep.Tolerations
+	}
+
 	return rec.customizePodSpec(r, i, ps)
 }
 
