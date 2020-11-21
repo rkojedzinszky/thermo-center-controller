@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/go-logr/logr v0.2.0
+	golang.org/x/mod v0.1.1-0.20191105210325-c90efee705ee
 	k8s.io/api v0.19.2
 	k8s.io/apimachinery v0.19.2
 	k8s.io/client-go v0.19.2

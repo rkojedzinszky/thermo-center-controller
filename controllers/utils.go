@@ -25,7 +25,10 @@ SOFTWARE.
 package controllers
 
 import (
+	"fmt"
 	"strings"
+
+	"golang.org/x/mod/semver"
 
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
 )
@@ -60,4 +63,12 @@ func setImageTag(i *kojedzinv1alpha1.ThermoCenter, image string) string {
 	}
 
 	return image + ":" + tag
+}
+
+func getImagePrefix(i *kojedzinv1alpha1.ThermoCenter) string {
+	if i.Spec.Version != nil && semver.Compare(fmt.Sprintf("v%s", *i.Spec.Version), "v4") < 0 {
+		return "docker.io/rkojedzinszky/thermo-center-"
+	}
+
+	return "ghcr.io/rkojedzinszky/thermo-center-"
 }

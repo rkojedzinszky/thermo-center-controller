@@ -8,9 +8,10 @@ steps:
 - name: build
   image: plugins/docker
   settings:
-    repo: rkojedzinszky/thermo-center-controller
+    repo: ghcr.io/rkojedzinszky/thermo-center-controller
+    registry: ghcr.io
     username: rkojedzinszky
     password:
-      from_secret: hub_docker_password
+      from_secret: ghcr.io.password
     auto_tag: true
 

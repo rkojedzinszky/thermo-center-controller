@@ -186,7 +186,7 @@ func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, re
 	if dep != nil && dep.Image != "" {
 		image = dep.Image
 	} else {
-		image = "rkojedzinszky/thermo-center-" + rec.component()
+		image = getImagePrefix(i) + rec.component()
 	}
 
 	ps := &v1.PodSpec{

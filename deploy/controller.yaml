@@ -15,7 +15,7 @@ spec:
       serviceAccountName: thermo-center-controller
       containers:
         - name: controller
-          image: rkojedzinszky/thermo-center-controller
+          image: ghcr.io/rkojedzinszky/thermo-center-controller
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
