@@ -95,8 +95,7 @@ func NewThermoCenterReconciler(mgr manager.Manager) *ThermoCenterReconciler {
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;create;update
 
-func (r *ThermoCenterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+func (r *ThermoCenterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	reqLogger := r.Log.WithValues("thermocenter", req.NamespacedName)
 
 	// Fetch the ThermoCenter instance
