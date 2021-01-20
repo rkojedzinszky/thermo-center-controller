@@ -135,13 +135,6 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 						Port: &httpPort,
 					},
 				},
-				From: []networking.NetworkPolicyPeer{
-					{
-						IPBlock: &networking.IPBlock{
-							CIDR: "0.0.0.0/0",
-						},
-					},
-				},
 			},
 		},
 	}
