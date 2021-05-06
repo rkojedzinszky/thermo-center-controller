@@ -33,7 +33,6 @@ import (
 )
 
 type receiverReconciler struct {
-	defaultDeploymentReconciler
 }
 
 func (rec *receiverReconciler) component() string {

@@ -65,8 +65,6 @@ func (r *ThermoCenterReconciler) fetchMigrationJob(i *kojedzinv1alpha1.ThermoCen
 	jobName := thermoCenterMigrationJobName(i)
 	job := &batchv1.Job{}
 
-	l = l.WithValues("jobName", jobName)
-
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: jobName}, job)
 	if err != nil {
 		if errors.IsNotFound(err) {

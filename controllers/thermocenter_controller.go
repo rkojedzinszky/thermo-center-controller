@@ -223,7 +223,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 
 	err = r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: deploymentName}, deployment)
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 
@@ -290,7 +290,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 
 	err = r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: serviceName}, service)
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 
@@ -352,16 +352,19 @@ type deploymentReconciler interface {
 
 type defaultDeploymentReconciler struct{}
 
+//lint:ignore U1000 noop function to comply with interface
 // Customize v1.PodSpec
 func (*defaultDeploymentReconciler) customizePodSpec(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, ps *v1.PodSpec) *v1.PodSpec {
 	return ps
 }
 
+//lint:ignore U1000 noop function to comply with interface
 // Customize corev1.Service
 func (*defaultDeploymentReconciler) customizeService(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, svc *v1.Service) *v1.Service {
 	return svc
 }
 
+//lint:ignore U1000 noop function to comply with interface
 // Customize appsv1.Deployment
 func (*defaultDeploymentReconciler) customizeDeployment(_ *ThermoCenterReconciler, _ *kojedzinv1alpha1.ThermoCenter, _ *appsv1.Deployment) {
 }
@@ -372,10 +375,6 @@ func thermoCenterDeploymentName(i *kojedzinv1alpha1.ThermoCenter, rec deployment
 
 func thermoCenterServiceName(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) string {
 	return i.Name + "-" + rec.component()
-}
-
-func thermoCenterConfigMapName(i *kojedzinv1alpha1.ThermoCenter) string {
-	return i.Name + "-cm"
 }
 
 func thermoCenterSecretName(i *kojedzinv1alpha1.ThermoCenter) string {

@@ -44,7 +44,7 @@ func (r *ThermoCenterReconciler) reconcileIngressTLSSecretName(i *kojedzinv1alph
 }
 
 func (r *ThermoCenterReconciler) reconcileIngressTLSSecret(i *kojedzinv1alpha1.ThermoCenter) error {
-	if i.Spec.Ingress.TLS == false {
+	if !i.Spec.Ingress.TLS {
 		return nil
 	}
 
@@ -53,7 +53,7 @@ func (r *ThermoCenterReconciler) reconcileIngressTLSSecret(i *kojedzinv1alpha1.T
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: secretName}, secret)
 
 	// Return if found or other than not-found error encountered
-	if err == nil || errors.IsNotFound(err) != true {
+	if err == nil || !errors.IsNotFound(err) {
 		return err
 	}
 
@@ -88,7 +88,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 
 	err = r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: ingressName}, ingress)
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 

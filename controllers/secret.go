@@ -56,7 +56,7 @@ func (r *ThermoCenterReconciler) reconcileSecret(i *kojedzinv1alpha1.ThermoCente
 
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: secretName}, secret)
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 

@@ -46,7 +46,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 	err := r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: policyName}, policy)
 
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 
@@ -102,7 +102,7 @@ func (r *ThermoCenterReconciler) reconcileNetworkPolicy(i *kojedzinv1alpha1.Ther
 	err = r.Get(context.TODO(), types.NamespacedName{Namespace: i.Namespace, Name: policyName}, policy)
 
 	if err != nil {
-		if errors.IsNotFound(err) != true {
+		if !errors.IsNotFound(err) {
 			return err
 		}
 
