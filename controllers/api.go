@@ -25,8 +25,6 @@ SOFTWARE.
 package controllers
 
 import (
-	"strings"
-
 	kojedzinv1alpha1 "github.com/rkojedzinszky/thermo-center-controller/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -60,15 +58,10 @@ func (api *apiReconciler) customizePodSpec(r *ThermoCenterReconciler, i *kojedzi
 		},
 	)
 
-	allowedHosts := strings.Join(i.Spec.Ingress.HostNames, ",")
-	if allowedHosts == "" {
-		allowedHosts = "undefined.domain.name"
-	}
-
 	ps.Containers[0].Env = append(ps.Containers[0].Env,
 		v1.EnvVar{
 			Name:  "ALLOWED_HOSTS",
-			Value: allowedHosts,
+			Value: "*",
 		},
 		v1.EnvVar{
 			Name:  "RECEIVER_HOST",
@@ -78,24 +71,13 @@ func (api *apiReconciler) customizePodSpec(r *ThermoCenterReconciler, i *kojedzi
 
 	r.memcached.setEnvironment(r, i, &ps.Containers[0].Env)
 
-	for _, host := range i.Spec.Ingress.HostNames {
-		if host != "" {
-			ps.Containers[0].ReadinessProbe = &v1.Probe{
-				Handler: v1.Handler{
-					HTTPGet: &v1.HTTPGetAction{
-						Path: "/healthz",
-						Port: intstr.IntOrString{IntVal: 8080},
-						HTTPHeaders: []v1.HTTPHeader{
-							{
-								Name:  "Host",
-								Value: host,
-							},
-						},
-					},
-				},
-			}
-			break
-		}
+	ps.Containers[0].ReadinessProbe = &v1.Probe{
+		Handler: v1.Handler{
+			HTTPGet: &v1.HTTPGetAction{
+				Path: "/healthz",
+				Port: intstr.IntOrString{IntVal: 8080},
+			},
+		},
 	}
 
 	return ps
