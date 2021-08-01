@@ -307,7 +307,7 @@ func (r *ThermoCenterReconciler) reconcile(i *kojedzinv1alpha1.ThermoCenter, rec
 				},
 			}
 
-			if err = controllerutil.SetControllerReference(i, service, r.Scheme); err != nil {
+			if err = controllerutil.SetControllerReference(deployment, service, r.Scheme); err != nil {
 				return err
 			}
 		}
