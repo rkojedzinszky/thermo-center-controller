@@ -1,12 +1,11 @@
 kind: pipeline
 name: build
-
-platform:
-  os: linux
+type: kubernetes
 
 steps:
 - name: build
-  image: plugins/docker:19
+  image: plugins/docker
+  pull: always
   settings:
     repo: ghcr.io/rkojedzinszky/thermo-center-controller
     registry: ghcr.io
@@ -17,3 +16,11 @@ steps:
     mirror:
       from_secret: hub_docker_mirror
 
+  privileged: true
+  volumes:
+    - name: docker
+      path: /var/lib/docker
+
+volumes:
+  - name: docker
+    temp: {}
