@@ -104,6 +104,7 @@ func (r *ThermoCenterReconciler) reconcileIngress(i *kojedzinv1alpha1.ThermoCent
 		}
 	}
 
+	ingress.Spec.IngressClassName = i.Spec.Ingress.ClassName
 	ingress.Spec.Rules = nil
 	pathType := networking.PathTypePrefix
 

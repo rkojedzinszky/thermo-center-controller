@@ -86,6 +86,9 @@ type Ingress struct {
 	// TLS specifies whether to generate tls section in Kubernetes Ingress resource
 	TLS bool `json:"tls,omitempty"`
 
+	// ClassName specifies ingressClassName to be set on created ingress
+	ClassName *string `json:"className,omitempty"`
+
 	// Extra annotations to add to Kubernetes Ingress resource
 	Annotations map[string]string `json:"annotations,omitempty"`
 }
