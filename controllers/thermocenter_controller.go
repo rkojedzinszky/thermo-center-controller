@@ -176,6 +176,7 @@ func (r *ThermoCenterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, rec deploymentReconciler) *v1.PodSpec {
 	enableServiceLinks := false
+	allowPrivilegeEscalation := false
 	runAsNonRoot := true
 
 	dep := rec.getDeployment(i)
@@ -192,11 +193,12 @@ func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, re
 		Containers: []v1.Container{{
 			Name:  rec.component(),
 			Image: setImageTag(i, image),
+			SecurityContext: &v1.SecurityContext{
+				RunAsNonRoot:             &runAsNonRoot,
+				AllowPrivilegeEscalation: &allowPrivilegeEscalation,
+			},
 		}},
 		EnableServiceLinks: &enableServiceLinks,
-		SecurityContext: &v1.PodSecurityContext{
-			RunAsNonRoot: &runAsNonRoot,
-		},
 	}
 
 	if dep != nil {
