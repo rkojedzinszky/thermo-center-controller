@@ -194,11 +194,13 @@ func (r *ThermoCenterReconciler) getPodSpec(i *kojedzinv1alpha1.ThermoCenter, re
 			Name:  rec.component(),
 			Image: setImageTag(i, image),
 			SecurityContext: &v1.SecurityContext{
-				RunAsNonRoot:             &runAsNonRoot,
 				AllowPrivilegeEscalation: &allowPrivilegeEscalation,
 			},
 		}},
 		EnableServiceLinks: &enableServiceLinks,
+		SecurityContext: &v1.PodSecurityContext{
+			RunAsNonRoot: &runAsNonRoot,
+		},
 	}
 
 	if dep != nil {
