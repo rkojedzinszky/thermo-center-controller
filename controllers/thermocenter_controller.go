@@ -72,8 +72,10 @@ type ThermoCenterReconciler struct {
 
 // NewThermoCenterReconciler instantiates a new ThermoCenter Reconciler
 func NewThermoCenterReconciler(mgr manager.Manager) *ThermoCenterReconciler {
+	client, _ := client.New(mgr.GetConfig(), client.Options{})
+
 	return &ThermoCenterReconciler{
-		Client: mgr.GetClient(),
+		Client: client,
 		Log:    ctrl.Log.WithName("controllers").WithName("ThermoCenter"),
 		Scheme: mgr.GetScheme(),
 
